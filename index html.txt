@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>南大東村ネコ目撃情報アンケート</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f7f6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; }
+    .intro-text { background-color: #e8f4fd; padding: 20px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 30px; border-left: 5px solid #3498db; white-space: pre-wrap; }
+    .form-group { margin-bottom: 25px; }
+    label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; }
+    #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
+    .hidden { display: none; }
+    input[type="text"], input[type="file"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    .sample-box { margin-top: 10px; margin-bottom: 10px; }
+    .sample-img { max-width: 150px; border-radius: 4px; border: 1px solid #ddd; display: block; }
+    .radio-group { padding: 5px 0; }
+    .radio-group label { display: inline-block; font-weight: normal; margin-right: 20px; cursor: pointer; }
+    .btn-location { background-color: #3498db; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-bottom: 12px; display: block; width: 100%; box-sizing: border-box; transition: background 0.2s; }
+    .btn-location:hover { background-color: #2980b9; }
+    #submitBtn { width: 100%; background-color: #2ecc71; color: white; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold; transition: background 0.2s; }
+    #submitBtn:hover { background-color: #27ae60; }
+    #output { margin-top: 20px; text-align: center; font-weight: bold; }
+    .required::after { content: " *"; color: #e74c3c; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>ネコ目撃情報アンケート</h2>
+  <div class="intro-text">南大東村ではネコに関するトラブルや野生動物の保全のためネコの避妊去勢手術を行っています。直近1ヶ月以内での外を歩くネコの目撃情報を集めています。皆様のご協力をお願いいたします。</div>
+
+  <form id="catForm" onsubmit="handleFormSubmit(this); return false;">
+    <div class="form-group">
+      <label class="required">目撃場所 (地図をタップ、または現在地ボタンを押してピンを立ててください)</label>
+      <button type="button" id="currentLocationBtn" class="btn-location" onclick="goToCurrentLocation()">現在地を取得する</button>
+      <div id="map"></div>
+      <input type="hidden" id="location" name="location" required>
+      <p id="locationDisplay" style="color: #7f8c8d; font-size: 0.9em; margin-top: 8px; font-style: italic;">場所が選択されていません</p>
+    </div>
+
+    <div class="form-group">
+      <label for="catCount" class="required">ネコの頭数</label>
+      <select id="catCount" name="catCount" onchange="toggleCatDetail()" required>
+        <option value="">選択してください</option>
+        <option value="1頭">1頭</option>
+        <option value="2頭">2頭</option>
+        <option value="3頭以上">3頭以上</option>
+        <option value="親子">親子</option>
+      </select>
+      
+      <div id="catCountNumGroup" class="hidden" style="margin-top: 15px;">
+        <label for="catCountNum" class="required">具体的な頭数</label>
+        <select id="catCountNum" name="catCountNum">
+          <option value="">選択してください</option>
+          <option value="3頭">3頭</option><option value="4頭">4頭</option><option value="5頭">5頭</option><option value="6頭以上">6頭以上</option>
+        </select>
+      </div>
+      <div id="catDetailGroup" class="hidden" style="margin-top: 15px;">
+        <label for="catCountDetail" class="required">頭数の詳細</label>
+        <input type="text" id="catCountDetail" name="catCountDetail" placeholder="例: 親1頭、子3頭 など">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="required">耳カットされている個体か</label>
+      <div class="radio-group">
+        <label><input type="radio" name="earCut" value="はい" required> はい</label>
+        <label><input type="radio" name="earCut" value="いいえ"> いいえ</label>
+        <label><input type="radio" name="earCut" value="わからない"> わからない</label>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="catPattern">ネコの柄（わかる範囲で）</label>
+      <input type="text" id="catPattern" name="catPattern" placeholder="例: キジトラ、白黒、三毛など">
+    </div>
+
+    <div class="form-group">
+      <label for="photo">目撃写真（データがあれば添付してください）</label>
+      <input type="file" id="photo" name="photo" accept="image/*">
+    </div>
+
+    <button type="submit" id="submitBtn">目撃情報を送信する</button>
+  </form>
+  <div id="output"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  var map = L.map('map').setView([25.845, 131.23], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+  var marker;
+  
+  map.on('click', function(e) { updateMarkerAndLocation(e.latlng); });
+
+  function goToCurrentLocation() {
+    if (!navigator.geolocation) { alert("お使いの端末は位置情報に対応していません。"); return; }
+    var locBtn = document.getElementById('currentLocationBtn');
+    locBtn.disabled = true; locBtn.innerText = "位置情報を取得中...";
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        var latlng = L.latLng(position.coords.latitude, position.coords.longitude);
+        map.setView(latlng, 16); updateMarkerAndLocation(latlng);
+        locBtn.disabled = false; locBtn.innerText = "現在地を取得する";
+      },
+      function() { alert("位置情報の取得に失敗しました。"); locBtn.disabled = false; locBtn.innerText = "現在地を取得する"; },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }
+
+  function updateMarkerAndLocation(latlng) {
+    var lat = latlng.lat.toFixed(6); var lng = latlng.lng.toFixed(6);
+    if (marker) { marker.setLatLng(latlng); } else { marker = L.marker(latlng).addTo(map); }
+    document.getElementById('location').value = lat + ", " + lng;
+    document.getElementById('locationDisplay').innerText = "選択された位置: 緯度 " + lat + " / 経度 " + lng;
+  }
+
+  function toggleCatDetail() {
+    var catCountSelect = document.getElementById('catCount').value;
+    var numGroup = document.getElementById('catCountNumGroup');
+    var detailGroup = document.getElementById('catDetailGroup');
+    numGroup.classList.add('hidden'); detailGroup.classList.add('hidden');
+    if (catCountSelect === '3頭以上') { numGroup.classList.remove('hidden'); }
+    else if (catCountSelect === '親子') { detailGroup.classList.remove('hidden'); }
+  }
+
+  function handleFormSubmit(formObject) {
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('output').innerText = "送信中...";
+
+    var latlngStr = document.getElementById('location').value;
+    var catCountSelect = document.getElementById('catCount').value;
+    var catCountResult = catCountSelect;
+    if (catCountSelect === '3頭以上') { catCountResult = document.getElementById('catCountNum').value; }
+    else if (catCountSelect === '親子') { catCountResult = document.getElementById('catCountDetail').value; }
+    var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value || "";
+    var catPatternVal = document.getElementById('catPattern').value;
+    
+    var fileInput = document.getElementById('photo');
+    var file = fileInput.files[0];
+    
+    var sendData = {
+      location: latlngStr, catCountResult: catCountResult, earCut: earCutSelect, catPattern: catPatternVal, photoData: null, photoName: null
+    };
+
+    if (file) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        sendData.photoData = e.target.result; sendData.photoName = file.name;
+        uploadToServer(sendData);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      uploadToServer(sendData);
+    }
+  }
+
+  function uploadToServer(sendData) {
+    // ⚠️ 下記のダブルクォーテーションの中に、あなたの新しいGASの本番用URL（/exec）を貼り付けてください
+    var gasUrl = "https://script.google.com/macros/s/AKfycby5Zqcn---_b2DunNIbgcCRUZg1ndDqGEeQ-Yfp2yIJFZ3E0n1p35p90lHzbapC0nPP/exec"; 
+    
+    fetch(gasUrl, {
+      method: "POST",
+      body: JSON.stringify(sendData),
+      mode: "no-cors"
+    })
+    .then(function() {
+      document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！";
+      document.getElementById('catForm').reset();
+      if (marker) { map.removeLayer(marker); marker = null; }
+      document.getElementById('submitBtn').disabled = false;
+    })
+    .catch(function(error) {
+      document.getElementById('output').innerText = "送信に失敗しました。";
+      document.getElementById('submitBtn').disabled = false;
+    });
+  }
+</script>
+</body>
+</html>
