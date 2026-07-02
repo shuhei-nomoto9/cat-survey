@@ -82,7 +82,7 @@
       <label class="required">耳カットされている個体か</label>
       
       <div class="sample-box">
-        <img class="sample-img" src="sample.jpg" alt="">
+        <img class="sample-img" src="unnamed.png" alt="">
       </div>
 
       <div class="radio-group">
@@ -191,8 +191,8 @@
   }
 
   function uploadToServer(sendData) {
-    // ⭕ あなたの正しいGASのURL（...gRunqZcq/exec）を確実にセットしました！
-    var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
+    // ⭕ あなたの個人用GASのURL（...Q2Pse/exec）を確実にセットしてあります
+    var gasUrl = "https://script.google.com/macros/s/AKfycbysiPzuRoUfj03WofY75kN5yLGvuwdQbGrk2crwCw6GMzIoKowhdBwSZV4GPshq2Pse/exec"; 
     fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
     .then(function() {
       document.getElementById('output').style.color = "#2ecc71"; 
