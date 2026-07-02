@@ -15,7 +15,7 @@
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
     #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .hidden { display: none; }
-    input[type="text"], input[type="file"], select, input[type="datetime-local"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    input[type="text"], input[type="file"], select, input[type="date"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
     
     .sample-box { margin-top: 10px; margin-bottom: 12px; }
     .sample-img { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd; display: block; margin: 0 auto; }
@@ -37,7 +37,7 @@
 <div class="container">
   <h2>ネコ目撃情報アンケート</h2>
   
-  <div class="notice-text">Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。</div>
+  <div class="notice-text">※匿名での回答になるため個人は特定されません。</div>
 
   <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
 そこで残りのネコ達の手術を進めるため、外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
@@ -52,8 +52,21 @@
     </div>
 
     <div class="form-group">
-      <label for="datetime" class="required">目撃日時</label>
-      <input type="datetime-local" id="datetime" name="datetime" required>
+      <label class="required">目撃日時</label>
+      <div style="display: flex; gap: 10px;">
+        <input type="date" id="dateInput" style="flex: 2;" required>
+        <select id="hourInput" style="flex: 1;" required>
+          <option value="">時頃</option>
+          <option value="00">0時頃</option><option value="01">1時頃</option><option value="02">2時頃</option>
+          <option value="03">3時頃</option><option value="04">4時頃</option><option value="05">5時頃</option>
+          <option value="06">6時頃</option><option value="07">7時頃</option><option value="08">8時頃</option>
+          <option value="09">9時頃</option><option value="10">10時頃</option><option value="11">11時頃</option>
+          <option value="12">12時頃</option><option value="13">13時頃</option><option value="14">14時頃</option>
+          <option value="15">15時頃</option><option value="16">16時頃</option><option value="17">17時頃</option>
+          <option value="18">18時頃</option><option value="19">19時頃</option><option value="20">20時頃</option>
+          <option value="21">21時頃</option><option value="22">22時頃</option><option value="23">23時頃</option>
+        </select>
+      </div>
     </div>
 
     <div class="form-group">
@@ -151,12 +164,11 @@
     else if (catCountSelect === '親子') { detailGroup.classList.remove('hidden'); }
   }
 
-  // 📝 耳カットの記述欄を出し入れする仕組み
   function toggleEarCutDetail() {
     var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value;
     var detailGroup = document.getElementById('earCutDetailGroup');
     var detailInput = document.getElementById('earCutDetail');
-    if (earCutSelect === 'その他') {
+    if (earCutSelect === 'browse' || earCutSelect === 'その他') {
       detailGroup.classList.remove('hidden');
       detailInput.required = true;
     } else {
@@ -171,13 +183,17 @@
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
     
     var latlngStr = document.getElementById('location').value;
-    var datetimeVal = document.getElementById('datetime').value;
+    
+    // 🕒 分を省いた日付と時間を合体させてGASに送る形式に自動組み立てします
+    var dateVal = document.getElementById('dateInput').value;
+    var hourVal = document.getElementById('hourInput').value;
+    var datetimeVal = dateVal + 'T' + hourVal + ':00';
+    
     var catCountSelect = document.getElementById('catCount').value;
     var catCountResult = catCountSelect;
     if (catCountSelect === '3頭以上') { catCountResult = document.getElementById('catCountNum').value; }
     else if (catCountSelect === '親子') { catCountResult = document.getElementById('catCountDetail').value; }
     
-    // 📝 「その他」が選ばれていたら、自由記述欄のテキストを送信データにします
     var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value || "";
     if (earCutSelect === 'その他') {
       earCutSelect = document.getElementById('earCutDetail').value;
@@ -224,7 +240,7 @@
       document.getElementById('output').style.color = "#2ecc71"; 
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
       document.getElementById('catForm').reset();
-      document.getElementById('earCutDetailGroup').classList.add('hidden'); // 記述欄を閉じる
+      document.getElementById('earCutDetailGroup').classList.add('hidden'); 
       if (marker) { map.removeLayer(marker); marker = null; }
       document.getElementById('submitBtn').disabled = false;
     })
