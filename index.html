@@ -82,13 +82,19 @@
       <label class="required">耳カットされている個体か</label>
       
       <div class="sample-box">
-        <img class="sample-img" src="unnamed.png" alt="">
+        <img class="sample-img" src="sample.jpg" alt="">
       </div>
 
       <div class="radio-group">
-        <label><input type="radio" name="earCut" value="はい" required> はい</label>
-        <label><input type="radio" name="earCut" value="いいえ"> いいえ</label>
-        <label><input type="radio" name="earCut" value="わからない"> わからない</label>
+        <label><input type="radio" name="earCut" value="はい" onchange="toggleEarCutDetail()" required> はい</label>
+        <label><input type="radio" name="earCut" value="いいえ" onchange="toggleEarCutDetail()"> いいえ</label>
+        <label><input type="radio" name="earCut" value="わからない" onchange="toggleEarCutDetail()"> わからない</label>
+        <label><input type="radio" name="earCut" value="その他" onchange="toggleEarCutDetail()"> その他</label>
+      </div>
+
+      <div id="earCutDetailGroup" class="hidden" style="margin-top: 15px;">
+        <label for="earCutDetail" class="required">耳カットの状況の詳細</label>
+        <input type="text" id="earCutDetail" name="earCutDetail" placeholder="例: 3頭中1頭耳カットあり など">
       </div>
     </div>
 
@@ -145,6 +151,21 @@
     else if (catCountSelect === '親子') { detailGroup.classList.remove('hidden'); }
   }
 
+  // 📝 耳カットの記述欄を出し入れする仕組み
+  function toggleEarCutDetail() {
+    var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value;
+    var detailGroup = document.getElementById('earCutDetailGroup');
+    var detailInput = document.getElementById('earCutDetail');
+    if (earCutSelect === 'その他') {
+      detailGroup.classList.remove('hidden');
+      detailInput.required = true;
+    } else {
+      detailGroup.classList.add('hidden');
+      detailInput.required = false;
+      detailInput.value = '';
+    }
+  }
+
   function handleFormSubmit(formObject) {
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
@@ -155,7 +176,13 @@
     var catCountResult = catCountSelect;
     if (catCountSelect === '3頭以上') { catCountResult = document.getElementById('catCountNum').value; }
     else if (catCountSelect === '親子') { catCountResult = document.getElementById('catCountDetail').value; }
+    
+    // 📝 「その他」が選ばれていたら、自由記述欄のテキストを送信データにします
     var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value || "";
+    if (earCutSelect === 'その他') {
+      earCutSelect = document.getElementById('earCutDetail').value;
+    }
+    
     var catPatternVal = document.getElementById('catPattern').value;
     var fileInput = document.getElementById('photo');
     var file = fileInput.files[0];
@@ -191,13 +218,13 @@
   }
 
   function uploadToServer(sendData) {
-    // ⭕ あなたの個人用GASのURL（...Q2Pse/exec）を確実にセットしてあります
     var gasUrl = "https://script.google.com/macros/s/AKfycbysiPzuRoUfj03WofY75kN5yLGvuwdQbGrk2crwCw6GMzIoKowhdBwSZV4GPshq2Pse/exec"; 
     fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
     .then(function() {
       document.getElementById('output').style.color = "#2ecc71"; 
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
       document.getElementById('catForm').reset();
+      document.getElementById('earCutDetailGroup').classList.add('hidden'); // 記述欄を閉じる
       if (marker) { map.removeLayer(marker); marker = null; }
       document.getElementById('submitBtn').disabled = false;
     })
