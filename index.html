@@ -9,19 +9,13 @@
     body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; background-color: #f4f7f6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
     h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 22px; }
-    
-    .anonymous-notice { font-size: 13px; color: #7f8c8d; margin-bottom: 10px; padding: 0 5px; }
+    .notice-text { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 15px; padding: 0 5px; }
     .intro-text { background-color: #e8f4fd; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-left: 5px solid #3498db; white-space: pre-wrap; }
     .form-group { margin-bottom: 25px; }
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
     #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .hidden { display: none; }
-    
-    input[type="text"], input[type="file"], select, input[type="date"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-    
-    .datetime-flex { display: flex; gap: 10px; }
-    .datetime-flex input[type="date"] { flex: 2; }
-    .datetime-flex select { flex: 1; }
+    input[type="text"], input[type="file"], select, input[type="datetime-local"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
     
     .sample-box { margin-top: 10px; margin-bottom: 12px; }
     .sample-img { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd; display: block; margin: 0 auto; }
@@ -43,10 +37,10 @@
 <div class="container">
   <h2>ネコ目撃情報アンケート</h2>
   
-  <div class="anonymous-notice">匿名での回答になります。個人は特定されません。</div>
+  <div class="notice-text">Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。</div>
 
   <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
-そこで残りのネコ達の手術を進めるため、外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
+そこで残りのネコ達の手術を進めるため、直近1ヶ月以内での外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
 
   <form id="catForm" onsubmit="handleFormSubmit(this); return false;">
     <div class="form-group">
@@ -58,25 +52,12 @@
     </div>
 
     <div class="form-group">
-      <label class="required">目撃日時</label>
-      <div class="datetime-flex">
-        <input type="date" id="date" name="date" required>
-        <select id="hour" name="hour" required>
-          <option value="">時頃</option>
-          <option value="00">0時頃</option><option value="01">1時頃</option><option value="02">2時頃</option>
-          <option value="03">3時頃</option><option value="04">4時頃</option><option value="05">5時頃</option>
-          <option value="06">6時頃</option><option value="07">7時頃</option><option value="08">8時頃</option>
-          <option value="09">9時頃</option><option value="10">10時頃</option><option value="11">11時頃</option>
-          <option value="12">12時頃</option><option value="13">13時頃</option><option value="14">14時頃</option>
-          <option value="15">15時頃</option><option value="16">16時頃</option><option value="17">17時頃</option>
-          <option value="18">18時頃</option><option value="19">19時頃</option><option value="20">20時頃</option>
-          <option value="21">21時頃</option><option value="22">22時頃</option><option value="23">23時頃</option>
-        </select>
-      </div>
+      <label for="datetime" class="required">目撃日時</label>
+      <input type="datetime-local" id="datetime" name="datetime" required>
     </div>
 
     <div class="form-group">
-      <label class="required">ネコの頭数</label>
+      <label for="catCount" class="required">ネコの頭数</label>
       <select id="catCount" name="catCount" onchange="toggleCatDetail()" required>
         <option value="">選択してください</option>
         <option value="1頭">1頭</option>
@@ -99,18 +80,15 @@
 
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
+      
       <div class="sample-box">
-        <img class="sample-img" src="unnamed.png" alt="">
+        <img class="sample-img" src="sample.jpg" alt="">
       </div>
+
       <div class="radio-group">
-        <label><input type="radio" name="earCut" value="はい" required onchange="toggleEarCutDetail()"> はい</label>
-        <label><input type="radio" name="earCut" value="いいえ" onchange="toggleEarCutDetail()"> いいえ</label>
-        <label><input type="radio" name="earCut" value="わからない" onchange="toggleEarCutDetail()"> わからない</label>
-        <label><input type="radio" name="earCut" value="その他" onchange="toggleEarCutDetail()"> その他</label>
-      </div>
-      <div id="earCutDetailGroup" class="hidden" style="margin-top: 15px;">
-        <label for="earCutDetail" class="required">その他の詳細（耳の状態など）</label>
-        <input type="text" id="earCutDetail" name="earCutDetail" placeholder="例: 3頭中1頭耳カット など">
+        <label><input type="radio" name="earCut" value="はい" required> はい</label>
+        <label><input type="radio" name="earCut" value="いいえ"> いいえ</label>
+        <label><input type="radio" name="earCut" value="わからない"> わからない</label>
       </div>
     </div>
 
@@ -167,41 +145,17 @@
     else if (catCountSelect === '親子') { detailGroup.classList.remove('hidden'); }
   }
 
-  // 💡 耳カットで「その他」が選ばれた時の入力欄表示切り替え関数
-  function toggleEarCutDetail() {
-    var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value;
-    var detailGroup = document.getElementById('earCutDetailGroup');
-    var detailInput = document.getElementById('earCutDetail');
-    if (earCutSelect === 'その他') {
-      detailGroup.classList.remove('hidden');
-      detailInput.required = true;
-    } else {
-      detailGroup.classList.add('hidden');
-      detailInput.required = false;
-    }
-  }
-
   function handleFormSubmit(formObject) {
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('output').style.color = "#e67e22"; 
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
     
     var latlngStr = document.getElementById('location').value;
-    var dateVal = document.getElementById('date').value;
-    var hourVal = document.getElementById('hour').value;
-    var datetimeVal = dateVal + "T" + hourVal + ":00";
-    
+    var datetimeVal = document.getElementById('datetime').value;
     var catCountSelect = document.getElementById('catCount').value;
     var catCountResult = catCountSelect;
     if (catCountSelect === '3頭以上') { catCountResult = document.getElementById('catCountNum').value; }
     else if (catCountSelect === '親子') { catCountResult = document.getElementById('catCountDetail').value; }
-    
-    // 💡 耳カットが「その他」だった場合、自由入力欄の文字を送信データにセットする
     var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value || "";
-    if (earCutSelect === 'その他') {
-      earCutSelect = document.getElementById('earCutDetail').value;
-    }
-    
     var catPatternVal = document.getElementById('catPattern').value;
     var fileInput = document.getElementById('photo');
     var file = fileInput.files[0];
@@ -213,8 +167,23 @@
     if (file) {
       var reader = new FileReader();
       reader.onload = function(e) {
-        sendData.photoData = e.target.result; sendData.photoName = file.name;
-        uploadToServer(sendData);
+        // 📸 重いスマホ写真を自動で一瞬で小さく縮小（リサイズ）する魔法の処理
+        var img = new Image();
+        img.onload = function() {
+          var canvas = document.createElement('canvas');
+          var MAX_WIDTH = 500; // 横幅を最大500ピクセルに制限（超軽量化）
+          var MAX_HEIGHT = 500;
+          var width = img.width; var height = img.height;
+          if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
+          else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+          canvas.width = width; canvas.height = height;
+          var ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
+          
+          sendData.photoData = canvas.toDataURL('image/jpeg', 0.7); // 画質を少し落としてさらに軽量化
+          sendData.photoName = file.name.split('.')[0] + '.jpg';
+          uploadToServer(sendData);
+        };
+        img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     } else {
@@ -223,31 +192,19 @@
   }
 
   function uploadToServer(sendData) {
-    var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
-    
-    fetch(gasUrl, { 
-      method: "POST", 
-      body: JSON.stringify(sendData),
-      mode: "no-cors",
-      credentials: "omit" 
-    })
+    // 🚀 あなたの個人アカウントのGASのURL（宛先）をそのまま維持しています
+    var gasUrl = "https://script.google.com/macros/s/AKfycbysiPzuRoUfj03WofY75kN5yLGvuwdQbGrk2crwCw6GMzIoKowhdBwSZV4GPshq2Pse/exec"; 
+    fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
     .then(function() {
-      document.getElementById('output').style.color = "#2ecc71"; // 緑色
+      document.getElementById('output').style.color = "#2ecc71"; 
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
       document.getElementById('catForm').reset();
       if (marker) { map.removeLayer(marker); marker = null; }
-      document.getElementById('locationDisplay').innerText = "場所が選択されていません";
-      
-      // 💡 送信成功後に、開いていた入力エリアをすべて綺麗に隠す処理を追加
-      document.getElementById('catCountNumGroup').classList.add('hidden');
-      document.getElementById('catDetailGroup').classList.add('hidden');
-      document.getElementById('earCutDetailGroup').classList.add('hidden');
-      
       document.getElementById('submitBtn').disabled = false;
     })
-    .catch(function(error) {
-      document.getElementById('output').style.color = "#e74c3c"; // 赤色
-      document.getElementById('output').innerText = "【通信エラー】データの送信に失敗しました。電波の良い場所で再度お試しください。";
+    .catch(function() {
+      document.getElementById('output').style.color = "#e74c3c"; 
+      document.getElementById('output').innerText = "送信に失敗しました。";
       document.getElementById('submitBtn').disabled = false;
     });
   }
