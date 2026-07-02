@@ -14,6 +14,11 @@
     #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .hidden { display: none; }
     input[type="text"], input[type="file"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    
+    /* 📸 追加した写真用のデザイン設定 */
+    .sample-box { margin-top: 10px; margin-bottom: 12px; }
+    .sample-img { max-width: 100%; max-height: 160px; border-radius: 8px; border: 1px solid #ddd; display: block; }
+    
     .radio-group { padding: 5px 0; }
     .radio-group label { display: inline-block; font-weight: normal; margin-right: 20px; cursor: pointer; }
     .btn-location { background-color: #3498db; color: white; padding: 10px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold; margin-bottom: 12px; display: block; width: 100%; box-sizing: border-box; transition: background 0.2s; }
@@ -63,6 +68,11 @@
 
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
+      
+      <div class="sample-box">
+        <img class="sample-img" src="sample.jpg" alt="耳カットの例">
+      </div>
+
       <div class="radio-group">
         <label><input type="radio" name="earCut" value="はい" required> はい</label>
         <label><input type="radio" name="earCut" value="いいえ"> いいえ</label>
