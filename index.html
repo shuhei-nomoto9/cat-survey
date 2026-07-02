@@ -35,7 +35,10 @@
 <body>
 <div class="container">
   <h2>ネコ目撃情報アンケート</h2>
-  <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
+  
+  <div class="intro-text">Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。
+
+南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
 そこで残りのネコ達の手術を進めるため、直近1ヶ月以内での外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
 
   <form id="catForm" onsubmit="handleFormSubmit(this); return false;">
@@ -73,7 +76,7 @@
       <label class="required">耳カットされている個体か</label>
       
       <div class="sample-box">
-        <img class="sample-img" src="unnamed.png" alt="">
+        <img class="sample-img" src="sample.jpg" alt="">
       </div>
 
       <div class="radio-group">
@@ -171,10 +174,7 @@
     fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
     .then(function() {
       document.getElementById('output').style.color = "#2ecc71"; // 緑色
-      
-      // 💬 送信完了の文字の後ろに、綺麗に改行して「何度でも回答できます」のメッセージを合体させました
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
-      
       document.getElementById('catForm').reset();
       if (marker) { map.removeLayer(marker); marker = null; }
       document.getElementById('submitBtn').disabled = false;
