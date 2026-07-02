@@ -9,16 +9,13 @@
     body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; background-color: #f4f7f6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
     h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 22px; }
-    
-    /* 💬 青枠の上の注意書き専用のデザイン（少し小さめの13px、読みやすいグレー） */
     .notice-text { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 15px; padding: 0 5px; }
-    
     .intro-text { background-color: #e8f4fd; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-left: 5px solid #3498db; white-space: pre-wrap; }
     .form-group { margin-bottom: 25px; }
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
     #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .hidden { display: none; }
-    input[type="text"], input[type="file"], select { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    input[type="text"], input[type="file"], select, input[type="datetime-local"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
     
     .sample-box { margin-top: 10px; margin-bottom: 12px; }
     .sample-img { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd; display: block; margin: 0 auto; }
@@ -38,9 +35,9 @@
 </head>
 <body>
 <div class="container">
-  <h2>ネコ目撃情報アンケート</h2>
+  <h2>ネコ目撃情報アンケート（匿名）</h2>
   
-  <div class="notice-text">※Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。</div>
+  <div class="notice-text">Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。</div>
 
   <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
 そこで残りのネコ達の手術を進めるため、直近1ヶ月以内での外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
@@ -52,6 +49,11 @@
       <div id="map"></div>
       <input type="hidden" id="location" name="location" required>
       <p id="locationDisplay" style="color: #7f8c8d; font-size: 0.9em; margin-top: 8px; font-style: italic;">場所が選択されていません</p>
+    </div>
+
+    <div class="form-group">
+      <label for="datetime" class="required">目撃日時</label>
+      <input type="datetime-local" id="datetime" name="datetime" required>
     </div>
 
     <div class="form-group">
@@ -148,6 +150,10 @@
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
     
     var latlngStr = document.getElementById('location').value;
+    
+    // 🕒 日時データの取得を追加
+    var datetimeVal = document.getElementById('datetime').value;
+    
     var catCountSelect = document.getElementById('catCount').value;
     var catCountResult = catCountSelect;
     if (catCountSelect === '3頭以上') { catCountResult = document.getElementById('catCountNum').value; }
@@ -158,7 +164,7 @@
     var file = fileInput.files[0];
     
     var sendData = {
-      location: latlngStr, catCountResult: catCountResult, earCut: earCutSelect, catPattern: catPatternVal, photoData: null, photoName: null
+      location: latlngStr, datetime: datetimeVal, catCountResult: catCountResult, earCut: earCutSelect, catPattern: catPatternVal, photoData: null, photoName: null
     };
 
     if (file) {
