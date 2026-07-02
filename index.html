@@ -15,7 +15,13 @@
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
     #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .hidden { display: none; }
-    input[type="text"], input[type="file"], select, input[type="datetime-local"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    
+    /* 日付と時間のセレクトボックス共通のスタイル */
+    input[type="text"], input[type="file"], select, input[type="date"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+    /* 日付と時間を横並びにするためのスタイル */
+    .datetime-flex { display: flex; gap: 10px; }
+    .datetime-flex input[type="date"] { flex: 2; }
+    .datetime-flex select { flex: 1; }
     
     .sample-box { margin-top: 10px; margin-bottom: 12px; }
     .sample-img { max-width: 100%; max-height: 200px; border-radius: 8px; border: 1px solid #ddd; display: block; margin: 0 auto; }
@@ -35,7 +41,7 @@
 </head>
 <body>
 <div class="container">
-  <h2>ネコ目撃情報アンケート（匿名）</h2>
+  <h2>ネコ目撃情報アンケート</h2>
   
   <div class="notice-text">Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。</div>
 
@@ -52,12 +58,25 @@
     </div>
 
     <div class="form-group">
-      <label for="datetime" class="required">目撃日時</label>
-      <input type="datetime-local" id="datetime" name="datetime" required>
+      <label class="required">目撃日時</label>
+      <div class="datetime-flex">
+        <input type="date" id="date" name="date" required>
+        <select id="hour" name="hour" required>
+          <option value="">時頃</option>
+          <option value="00">0時頃</option><option value="01">1時頃</option><option value="02">2時頃</option>
+          <option value="03">3時頃</option><option value="04">4時頃</option><option value="05">5時頃</option>
+          <option value="06">6時頃</option><option value="07">7時頃</option><option value="08">8時頃</option>
+          <option value="09">9時頃</option><option value="10">10時頃</option><option value="11">11時頃</option>
+          <option value="12">12時頃</option><option value="13">13時頃</option><option value="14">14時頃</option>
+          <option value="15">15時頃</option><option value="16">16時頃</option><option value="17">17時頃</option>
+          <option value="18">18時頃</option><option value="19">19時頃</option><option value="20">20時頃</option>
+          <option value="21">21時頃</option><option value="22">22時頃</option><option value="23">23時頃</option>
+        </select>
+      </div>
     </div>
 
     <div class="form-group">
-      <label for="catCount" class="required">ネコの頭数</label>
+      <label class="required">ネコの頭数</label>
       <select id="catCount" name="catCount" onchange="toggleCatDetail()" required>
         <option value="">選択してください</option>
         <option value="1頭">1頭</option>
@@ -80,7 +99,7 @@
 
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
-      
+       
       <div class="sample-box">
         <img class="sample-img" src="unnamed.png" alt="">
       </div>
@@ -151,8 +170,10 @@
     
     var latlngStr = document.getElementById('location').value;
     
-    // 🕒 日時データの取得を追加
-    var datetimeVal = document.getElementById('datetime').value;
+    // 🕒 日付と時間を取得し、秒・分を「:00」として従来のフォーマットに結合
+    var dateVal = document.getElementById('date').value;
+    var hourVal = document.getElementById('hour').value;
+    var datetimeVal = dateVal + "T" + hourVal + ":00";
     
     var catCountSelect = document.getElementById('catCount').value;
     var catCountResult = catCountSelect;
