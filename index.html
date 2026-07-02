@@ -18,7 +18,6 @@
     
     input[type="text"], input[type="file"], select, input[type="date"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
     
-    /* 日付と時間を横並びにするスタイル */
     .datetime-flex { display: flex; gap: 10px; }
     .datetime-flex input[type="date"] { flex: 2; }
     .datetime-flex select { flex: 1; }
@@ -100,7 +99,7 @@
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
       <div class="sample-box">
-        <img class="sample-img" src="sample.jpg" alt="">
+        <img class="sample-img" src="unnamed.png" alt="">
       </div>
       <div class="radio-group">
         <label><input type="radio" name="earCut" value="はい" required> はい</label>
@@ -164,12 +163,10 @@
 
   function handleFormSubmit(formObject) {
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('output').style.color = "#e67e22"; // オレンジ色
+    document.getElementById('output').style.color = "#e67e22"; // オレンジ
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
     
     var latlngStr = document.getElementById('location').value;
-    
-    // 日付と時間を取得し、秒・分を「:00」として裏側でドッキング
     var dateVal = document.getElementById('date').value;
     var hourVal = document.getElementById('hour').value;
     var datetimeVal = dateVal + "T" + hourVal + ":00";
@@ -200,30 +197,26 @@
   }
 
   function uploadToServer(sendData) {
-    // ⚠️【注意】ご自身のGASのWebアプリURLであるかご確認ください
     var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
     
-    // 💡 mode: "no-cors"を廃止し、セキュリティエラーを正しく検知できるように変更
+    // 💡 mode: "no-cors" を復活させて「誰でもログインなしで開いて送れる状態」に戻しました
     fetch(gasUrl, { 
       method: "POST", 
-      body: JSON.stringify(sendData)
+      body: JSON.stringify(sendData),
+      mode: "no-cors" 
     })
-    .then(function(response) {
-      if (!response.ok) { throw new Error('Network response was not ok'); }
-      return response.json();
-    })
-    .then(function(result) {
+    .then(function() {
+      // 💡 組織アカウントでサイレントに弾かれた場合も考慮し、完了メッセージに注意書きを添えています
       document.getElementById('output').style.color = "#2ecc71"; // 緑色
-      document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
+      document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。\n\n⚠️【ご注意】もし数分経ってもデータが反映されない場合は、スマホの組織アカウントの制限が原因です。その際はお手数ですが、シークレットモード（プライベートモード）で開き直して再度お試しください。";
       document.getElementById('catForm').reset();
       if (marker) { map.removeLayer(marker); marker = null; }
       document.getElementById('locationDisplay').innerText = "場所が選択されていません";
       document.getElementById('submitBtn').disabled = false;
     })
     .catch(function(error) {
-      // 💡 組織アカウントなどの制限に引っかかった場合、確実にここに流れて赤文字警告を出します
       document.getElementById('output').style.color = "#e74c3c"; // 赤色
-      document.getElementById('output').innerText = "【送信エラー】セキュリティ制限、または組織アカウント（会社や学校等）の影響で送信がブロックされました。\n\nお手数ですが、SafariやChromeなどの「シークレットブラウザ（プライベートモード）」で本ページを開き直すか、別の通常ブラウザアプリでお試しください。";
+      document.getElementById('output').innerText = "通信エラーが発生しました。電波の良い場所で再度お試しください。";
       document.getElementById('submitBtn').disabled = false;
     });
   }
