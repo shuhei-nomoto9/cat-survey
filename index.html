@@ -16,9 +16,9 @@
     #map { height: 300px; width: 100%; border-radius: 8px; border: 1px solid #ddd; }
     .hidden { display: none; }
     
-    /* 日付と時間のセレクトボックス共通のスタイル */
     input[type="text"], input[type="file"], select, input[type="date"] { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
-    /* 日付と時間を横並びにするためのスタイル */
+    
+    /* 日付と時間を横並びにするスタイル */
     .datetime-flex { display: flex; gap: 10px; }
     .datetime-flex input[type="date"] { flex: 2; }
     .datetime-flex select { flex: 1; }
@@ -99,11 +99,9 @@
 
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
-       
       <div class="sample-box">
-        <img class="sample-img" src="unnamed.png" alt="">
+        <img class="sample-img" src="sample.jpg" alt="">
       </div>
-
       <div class="radio-group">
         <label><input type="radio" name="earCut" value="はい" required> はい</label>
         <label><input type="radio" name="earCut" value="いいえ"> いいえ</label>
@@ -166,11 +164,12 @@
 
   function handleFormSubmit(formObject) {
     document.getElementById('submitBtn').disabled = true;
+    document.getElementById('output').style.color = "#e67e22"; // オレンジ色
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
     
     var latlngStr = document.getElementById('location').value;
     
-    // 🕒 日付と時間を取得し、秒・分を「:00」として従来のフォーマットに結合
+    // 日付と時間を取得し、秒・分を「:00」として裏側でドッキング
     var dateVal = document.getElementById('date').value;
     var hourVal = document.getElementById('hour').value;
     var datetimeVal = dateVal + "T" + hourVal + ":00";
@@ -201,18 +200,30 @@
   }
 
   function uploadToServer(sendData) {
+    // ⚠️【注意】ご自身のGASのWebアプリURLであるかご確認ください
     var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
-    fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
-    .then(function() {
+    
+    // 💡 mode: "no-cors"を廃止し、セキュリティエラーを正しく検知できるように変更
+    fetch(gasUrl, { 
+      method: "POST", 
+      body: JSON.stringify(sendData)
+    })
+    .then(function(response) {
+      if (!response.ok) { throw new Error('Network response was not ok'); }
+      return response.json();
+    })
+    .then(function(result) {
       document.getElementById('output').style.color = "#2ecc71"; // 緑色
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
       document.getElementById('catForm').reset();
       if (marker) { map.removeLayer(marker); marker = null; }
+      document.getElementById('locationDisplay').innerText = "場所が選択されていません";
       document.getElementById('submitBtn').disabled = false;
     })
-    .catch(function() {
+    .catch(function(error) {
+      // 💡 組織アカウントなどの制限に引っかかった場合、確実にここに流れて赤文字警告を出します
       document.getElementById('output').style.color = "#e74c3c"; // 赤色
-      document.getElementById('output').innerText = "送信に失敗しました。";
+      document.getElementById('output').innerText = "【送信エラー】セキュリティ制限、または組織アカウント（会社や学校等）の影響で送信がブロックされました。\n\nお手数ですが、SafariやChromeなどの「シークレットブラウザ（プライベートモード）」で本ページを開き直すか、別の通常ブラウザアプリでお試しください。";
       document.getElementById('submitBtn').disabled = false;
     });
   }
