@@ -9,6 +9,10 @@
     body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; background-color: #f4f7f6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
     h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 22px; }
+    
+    /* 💡 追加したグレーの補足テキスト用スタイル */
+    .anonymous-notice { font-size: 13px; color: #7f8c8d; margin-bottom: 10px; padding: 0 5px; }
+    
     .intro-text { background-color: #e8f4fd; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-left: 5px solid #3498db; white-space: pre-wrap; }
     .form-group { margin-bottom: 25px; }
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
@@ -41,6 +45,8 @@
 <div class="container">
   <h2>ネコ目撃情報アンケート</h2>
   
+  <div class="anonymous-notice">匿名での回答になります。個人は特定されません。</div>
+
   <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
 そこで残りのネコ達の手術を進めるため、直近1ヶ月以内での外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
 
@@ -96,7 +102,7 @@
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
       <div class="sample-box">
-        <img class="sample-img" src="unnamed.png" alt="">
+        <img class="sample-img" src="sample.jpg" alt="">
       </div>
       <div class="radio-group">
         <label><input type="radio" name="earCut" value="はい" required> はい</label>
@@ -160,7 +166,7 @@
 
   function handleFormSubmit(formObject) {
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('output').style.color = "#e67e22"; // オレンジ
+    document.getElementById('output').style.color = "#e67e22"; 
     document.getElementById('output').innerText = "回答を送信中です。送信には時間がかかる場合がございます、そのままの画面でお待ちください。";
     
     var latlngStr = document.getElementById('location').value;
@@ -200,10 +206,9 @@
       method: "POST", 
       body: JSON.stringify(sendData),
       mode: "no-cors",
-      credentials: "omit" // 💡 組織アカウントのログイン情報をゴミ箱にポイして、誰でもログインなしで送れるようにする魔法の設定
+      credentials: "omit" 
     })
     .then(function() {
-      // 💡 正常送信時：余計な説明文は一切なし。感謝の言葉だけにしました！
       document.getElementById('output').style.color = "#2ecc71"; // 緑色
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
       document.getElementById('catForm').reset();
@@ -212,7 +217,6 @@
       document.getElementById('submitBtn').disabled = false;
     })
     .catch(function(error) {
-      // 💡 電波が悪い、通信が切れたなどのリアルなエラーの時だけ赤文字になります
       document.getElementById('output').style.color = "#e74c3c"; // 赤色
       document.getElementById('output').innerText = "【通信エラー】データの送信に失敗しました。電波の良い場所で再度お試しください。";
       document.getElementById('submitBtn').disabled = false;
