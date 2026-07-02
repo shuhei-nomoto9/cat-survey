@@ -162,7 +162,8 @@
   }
 
   function uploadToServer(sendData) {
-    var gasUrl = "https://script.google.com/macros/s/AKfycbysiPzuRoUfj03WofY75kN5yLGvuwdQbGrk2crwCw6GMzIoKowhdBwSZV4GPshq2Pse/exec"; 
+    // 🚀 新しいGoogle Workspace用のGAS本番URLをセットしました
+    var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
     fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
     .then(function() {
       document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！";
