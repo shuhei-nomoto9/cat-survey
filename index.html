@@ -10,9 +10,7 @@
     .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
     h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 22px; }
     
-    /* 💡 追加したグレーの補足テキスト用スタイル */
     .anonymous-notice { font-size: 13px; color: #7f8c8d; margin-bottom: 10px; padding: 0 5px; }
-    
     .intro-text { background-color: #e8f4fd; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-left: 5px solid #3498db; white-space: pre-wrap; }
     .form-group { margin-bottom: 25px; }
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
@@ -45,7 +43,7 @@
 <div class="container">
   <h2>ネコ目撃情報アンケート</h2>
   
-  <div class="anonymous-notice">※匿名での回答になります。個人は特定されません。</div>
+  <div class="anonymous-notice">匿名での回答になります。個人は特定されません。</div>
 
   <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
 そこで残りのネコ達の手術を進めるため、直近1ヶ月以内での外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
@@ -105,9 +103,14 @@
         <img class="sample-img" src="unnamed.png" alt="">
       </div>
       <div class="radio-group">
-        <label><input type="radio" name="earCut" value="はい" required> はい</label>
-        <label><input type="radio" name="earCut" value="いいえ"> いいえ</label>
-        <label><input type="radio" name="earCut" value="わからない"> わからない</label>
+        <label><input type="radio" name="earCut" value="はい" required onchange="toggleEarCutDetail()"> はい</label>
+        <label><input type="radio" name="earCut" value="いいえ" onchange="toggleEarCutDetail()"> いいえ</label>
+        <label><input type="radio" name="earCut" value="わからない" onchange="toggleEarCutDetail()"> わからない</label>
+        <label><input type="radio" name="earCut" value="その他" onchange="toggleEarCutDetail()"> その他</label>
+      </div>
+      <div id="earCutDetailGroup" class="hidden" style="margin-top: 15px;">
+        <label for="earCutDetail" class="required">その他の詳細（耳の状態など）</label>
+        <input type="text" id="earCutDetail" name="earCutDetail" placeholder="例: 右耳だけカット、さくら耳か怪しい など">
       </div>
     </div>
 
@@ -164,6 +167,20 @@
     else if (catCountSelect === '親子') { detailGroup.classList.remove('hidden'); }
   }
 
+  // 💡 耳カットで「その他」が選ばれた時の入力欄表示切り替え関数
+  function toggleEarCutDetail() {
+    var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value;
+    var detailGroup = document.getElementById('earCutDetailGroup');
+    var detailInput = document.getElementById('earCutDetail');
+    if (earCutSelect === 'その他') {
+      detailGroup.classList.remove('hidden');
+      detailInput.required = true;
+    } else {
+      detailGroup.classList.add('hidden');
+      detailInput.required = false;
+    }
+  }
+
   function handleFormSubmit(formObject) {
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('output').style.color = "#e67e22"; 
@@ -178,7 +195,13 @@
     var catCountResult = catCountSelect;
     if (catCountSelect === '3頭以上') { catCountResult = document.getElementById('catCountNum').value; }
     else if (catCountSelect === '親子') { catCountResult = document.getElementById('catCountDetail').value; }
+    
+    // 💡 耳カットが「その他」だった場合、自由入力欄の文字を送信データにセットする
     var earCutSelect = document.querySelector('input[name="earCut"]:checked')?.value || "";
+    if (earCutSelect === 'その他') {
+      earCutSelect = document.getElementById('earCutDetail').value;
+    }
+    
     var catPatternVal = document.getElementById('catPattern').value;
     var fileInput = document.getElementById('photo');
     var file = fileInput.files[0];
@@ -214,6 +237,12 @@
       document.getElementById('catForm').reset();
       if (marker) { map.removeLayer(marker); marker = null; }
       document.getElementById('locationDisplay').innerText = "場所が選択されていません";
+      
+      // 💡 送信成功後に、開いていた入力エリアをすべて綺麗に隠す処理を追加
+      document.getElementById('catCountNumGroup').classList.add('hidden');
+      document.getElementById('catDetailGroup').classList.add('hidden');
+      document.getElementById('earCutDetailGroup').classList.add('hidden');
+      
       document.getElementById('submitBtn').disabled = false;
     })
     .catch(function(error) {
