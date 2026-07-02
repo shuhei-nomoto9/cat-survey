@@ -167,11 +167,10 @@
     if (file) {
       var reader = new FileReader();
       reader.onload = function(e) {
-        // 📸 重いスマホ写真を自動で一瞬で小さく縮小（リサイズ）する魔法の処理
         var img = new Image();
         img.onload = function() {
           var canvas = document.createElement('canvas');
-          var MAX_WIDTH = 500; // 横幅を最大500ピクセルに制限（超軽量化）
+          var MAX_WIDTH = 500; 
           var MAX_HEIGHT = 500;
           var width = img.width; var height = img.height;
           if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } }
@@ -179,7 +178,7 @@
           canvas.width = width; canvas.height = height;
           var ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
           
-          sendData.photoData = canvas.toDataURL('image/jpeg', 0.7); // 画質を少し落としてさらに軽量化
+          sendData.photoData = canvas.toDataURL('image/jpeg', 0.7); 
           sendData.photoName = file.name.split('.')[0] + '.jpg';
           uploadToServer(sendData);
         };
@@ -192,8 +191,8 @@
   }
 
   function uploadToServer(sendData) {
-    // 🚀 あなたの個人アカウントのGASのURL（宛先）をそのまま維持しています
-    var gasUrl = "https://script.google.com/macros/s/AKfycbysiPzuRoUfj03WofY75kN5yLGvuwdQbGrk2crwCw6GMzIoKowhdBwSZV4GPshq2Pse/exec"; 
+    // ⭕ あなたの正しいGASのURL（...gRunqZcq/exec）を確実にセットしました！
+    var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
     fetch(gasUrl, { method: "POST", body: JSON.stringify(sendData), mode: "no-cors" })
     .then(function() {
       document.getElementById('output').style.color = "#2ecc71"; 
