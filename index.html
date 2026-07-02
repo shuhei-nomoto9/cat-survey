@@ -9,7 +9,6 @@
     body { font-family: 'Helvetica Neue', Arial, sans-serif; margin: 0; padding: 10px; background-color: #f4f7f6; color: #333; }
     .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px 15px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); box-sizing: border-box; }
     h2 { text-align: center; color: #2c3e50; margin-bottom: 20px; font-size: 22px; }
-    .notice-text { font-size: 13px; color: #555; line-height: 1.5; margin-bottom: 15px; padding: 0 5px; }
     .intro-text { background-color: #e8f4fd; padding: 15px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 25px; border-left: 5px solid #3498db; white-space: pre-wrap; }
     .form-group { margin-bottom: 25px; }
     label { font-weight: bold; display: block; margin-bottom: 8px; color: #34495e; font-size: 15px; }
@@ -42,8 +41,6 @@
 <div class="container">
   <h2>ネコ目撃情報アンケート</h2>
   
-  <div class="notice-text">Google Workspaceアカウントではセキュリティの関係上、回答が反映されません。お手数ですが個人アカウントでの回答をお願いします。なお、匿名での回答になるため個人は特定されません。</div>
-
   <div class="intro-text">南大東村ではネコに関するトラブルや南大東島固有の野生動物の保全のためネコの避妊去勢手術を行っています。皆さまのご協力により多くのネコに避妊去勢手術を実施することができ、最終段階に近づいてきています。
 そこで残りのネコ達の手術を進めるため、直近1ヶ月以内での外を歩くネコの目撃情報を集めています。「1回だけ見た」という方でもお気軽にお答えください。皆様のご協力をお願いいたします。</div>
 
@@ -99,7 +96,7 @@
     <div class="form-group">
       <label class="required">耳カットされている個体か</label>
       <div class="sample-box">
-        <img class="sample-img" src="unnamed.png" alt="">
+        <img class="sample-img" src="sample.jpg" alt="">
       </div>
       <div class="radio-group">
         <label><input type="radio" name="earCut" value="はい" required> はい</label>
@@ -199,24 +196,25 @@
   function uploadToServer(sendData) {
     var gasUrl = "https://script.google.com/macros/s/AKfycbw1k-Gms-lt5em4iJFi4020HFjiIncMAXoD8CAwYpb-2EaYD8150obaJiUsgRunqZcq/exec"; 
     
-    // 💡 mode: "no-cors" を復活させて「誰でもログインなしで開いて送れる状態」に戻しました
     fetch(gasUrl, { 
       method: "POST", 
       body: JSON.stringify(sendData),
-      mode: "no-cors" 
+      mode: "no-cors",
+      credentials: "omit" // 💡 組織アカウントのログイン情報をゴミ箱にポイして、誰でもログインなしで送れるようにする魔法の設定
     })
     .then(function() {
-      // 💡 組織アカウントでサイレントに弾かれた場合も考慮し、完了メッセージに注意書きを添えています
+      // 💡 正常送信時：余計な説明文は一切なし。感謝の言葉だけにしました！
       document.getElementById('output').style.color = "#2ecc71"; // 緑色
-      document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。\n\n⚠️【ご注意】もし数分経ってもデータが反映されない場合は、スマホの組織アカウントの制限が原因です。その際はお手数ですが、シークレットモード（プライベートモード）で開き直して再度お試しください。";
+      document.getElementById('output').innerText = "目撃情報を送信しました。ご協力ありがとうございました！\nこのアンケートは何度でも回答できます。";
       document.getElementById('catForm').reset();
       if (marker) { map.removeLayer(marker); marker = null; }
       document.getElementById('locationDisplay').innerText = "場所が選択されていません";
       document.getElementById('submitBtn').disabled = false;
     })
     .catch(function(error) {
+      // 💡 電波が悪い、通信が切れたなどのリアルなエラーの時だけ赤文字になります
       document.getElementById('output').style.color = "#e74c3c"; // 赤色
-      document.getElementById('output').innerText = "通信エラーが発生しました。電波の良い場所で再度お試しください。";
+      document.getElementById('output').innerText = "【通信エラー】データの送信に失敗しました。電波の良い場所で再度お試しください。";
       document.getElementById('submitBtn').disabled = false;
     });
   }
